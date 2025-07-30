@@ -141,6 +141,7 @@ public class SupplierController {
                txtName.setText(result.getString("sname"));
                txtAddress.setText(result.getString("address"));
                txtTel.setText(Integer.toString(result.getInt("tel")));
+                System.out.println("Search Successfully");
 
 
             }
