@@ -1,9 +1,11 @@
-package com.example.project001;
+package com.example.project001.controller;
 
 
+import com.example.project001.dto.SupplierDto;
+import com.example.project001.model.SupplierModel;
+import com.example.project001.tm.Supplier1;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -36,33 +38,8 @@ public class SupplierController {
         String address = txtAddress.getText();
         int tel = Integer.parseInt(txtTel.getText());
 
-        try {
-
-            String SQL = "INSERT INTO Supplier VALUES(?, ?, ?, ?)";
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
-
-            PreparedStatement ps = conn.prepareStatement(SQL);
-            ps.setString(1, id);
-            ps.setString(2, name);
-            ps.setString(3, address);
-            ps.setInt(4, tel);
-
-
-
-            int result = ps.executeUpdate();
-
-            if (result >= 1) {
-                System.out.println("Added Successfully");
-            }else {
-                System.out.println("Not Added Successfully");
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
+        SupplierDto supplierDto = new SupplierDto(id, name, address, tel);
+        SupplierModel.saveData(supplierDto);
 
     }
 

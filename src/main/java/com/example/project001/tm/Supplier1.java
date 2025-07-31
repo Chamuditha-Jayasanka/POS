@@ -1,4 +1,4 @@
-package com.example.project001;
+package com.example.project001.tm;
 
 public class Supplier1 {
     private String id;
