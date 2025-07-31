@@ -1,11 +1,15 @@
 package com.example.project001;
 
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class SupplierController {
 
@@ -13,7 +17,17 @@ public class SupplierController {
     public TextField txtName;
     public TextField txtAddress;
     public TextField txtTel;
-    public TableView tableView;
+    public TableView<Supplier1> tableView;
+
+    public void initialize() {
+        tableView.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
+        tableView.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
+        tableView.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("address"));
+        tableView.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("tel"));
+
+        ArrayList<Supplier1> List = getAllSuppliers();
+        tableView.setItems(FXCollections.observableList(List));
+    }
 
     public void addBtn(ActionEvent actionEvent) {
 
@@ -143,15 +157,45 @@ public class SupplierController {
                txtTel.setText(Integer.toString(result.getInt("tel")));
                 System.out.println("Search Successfully");
 
-
             }
-
-
-
-
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+
+    public ArrayList<Supplier1> getAllSuppliers() {
+
+        try {
+        String SQL = "SELECT * FROM Supplier";
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
+
+        PreparedStatement ps = conn.prepareStatement(SQL);
+
+
+        ResultSet result = ps.executeQuery();
+
+            ArrayList<Supplier1> suppliers = new ArrayList<>();
+
+
+            while (result.next()){
+                suppliers.add(new Supplier1(
+                        result.getString("sid"),
+                        result.getString("sname"),
+                        result.getString("address"),
+                        String.valueOf(result.getInt("tel"))
+                ));
+
+        }
+            return suppliers;
+
+    } catch (Exception e) {
+        System.out.println(e.getMessage());
+    }
+        return null;
     }
 }
