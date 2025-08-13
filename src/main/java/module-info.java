@@ -2,6 +2,7 @@ module com.example.project001 {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires static lombok;
 
 
     opens com.example.project001 to javafx.fxml;
