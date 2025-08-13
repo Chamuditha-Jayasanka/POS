@@ -6,12 +6,15 @@ import com.example.project001.model.SupplierModel;
 import com.example.project001.tm.Supplier1;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SupplierController {
 
@@ -27,7 +30,8 @@ public class SupplierController {
         tableView.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("address"));
         tableView.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("tel"));
 
-        ArrayList<Supplier1> List = getAllSuppliers();
+        ArrayList<Supplier1> List = SupplierModel.getAllSuppliers();
+
         tableView.setItems(FXCollections.observableList(List));
     }
 
@@ -39,140 +43,71 @@ public class SupplierController {
         int tel = Integer.parseInt(txtTel.getText());
 
         SupplierDto supplierDto = new SupplierDto(id, name, address, tel);
-        SupplierModel.saveData(supplierDto);
+
+        int result = SupplierModel.saveData(supplierDto);
+
+
+        if (result >= 0) {
+            System.out.println("Added Successfully");
+            initialize();
+        } else {
+            System.out.println("Not Added Successfully");
+        }
 
     }
 
     public void updateBtn(ActionEvent actionEvent) {
+
         String id = txtId.getText();
         String name = txtName.getText();
         String address = txtAddress.getText();
         int tel = Integer.parseInt(txtTel.getText());
 
-        try {
+        SupplierDto supplierDto = new SupplierDto(id, name, address, tel);
+        int result = SupplierModel.updateData(supplierDto);
 
-            String SQL = "UPDATE  Supplier SET sname = ?, address = ?, tel = ? WHERE sid = ?";
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
-
-            PreparedStatement ps = conn.prepareStatement(SQL);
-            ps.setString(1, name);
-            ps.setString(2, address);
-            ps.setInt(3, tel);
-            ps.setString(4, id);
-
-
-
-            int result = ps.executeUpdate();
-
-            if (result >= 0) {
-                System.out.println("Updated Successfully");
-            }else {
-                System.out.println("Not Updated Successfully");
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (result >= 0) {
+            System.out.println("Updated Successfully");
+            initialize();
+        } else {
+            System.out.println("Not Updated Successfully");
         }
     }
 
     public void deleteBtn(ActionEvent actionEvent) {
+
         String id = txtId.getText();
 
+        SupplierDto supplierDto = new SupplierDto(id);
 
-        try {
+        int result =  SupplierModel.deleteData(supplierDto);
 
-            String SQL = "Delete FROM Supplier WHERE sid = ?";
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
-
-            PreparedStatement ps = conn.prepareStatement(SQL);
-            ps.setString(1, id);
-
-
-
-            int result = ps.executeUpdate();
-
-            if (result >= 0) {
-                System.out.println("Delete Successfully");
-            }else {
-                System.out.println("Not Delete Successfully");
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (result > 0) {
+            System.out.println("Deleted Successfully");
+            initialize();
+        }else {
+            System.out.println("Not Deleted Successfully");
         }
+
     }
 
     public void searchBtn(ActionEvent actionEvent) {
+
         String id = txtId.getText();
 
+        SupplierDto supplier = SupplierModel.searchData(id);
 
-        try {
-
-            String SQL = "SELECT * FROM Supplier WHERE sid = ?";
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
-
-            PreparedStatement ps = conn.prepareStatement(SQL);
-            ps.setString(1, id);
-
-
-
-
-            ResultSet result = ps.executeQuery();
-
-            if (result.next()){
-
-
-               txtName.setText(result.getString("sname"));
-               txtAddress.setText(result.getString("address"));
-               txtTel.setText(Integer.toString(result.getInt("tel")));
-                System.out.println("Search Successfully");
-
-            }
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (supplier != null) {
+            txtName.setText(supplier.getName());
+            txtAddress.setText(supplier.getAddress());
+            txtTel.setText(Integer.toString(supplier.getTel()));
+            System.out.println("Search Successfully");
+        } else {
+            System.out.println("Supplier not found");
+            txtName.clear();
+            txtAddress.clear();
+            txtTel.clear();
         }
     }
 
-
-    public ArrayList<Supplier1> getAllSuppliers() {
-
-        try {
-        String SQL = "SELECT * FROM Supplier";
-
-        Class.forName("com.mysql.cj.jdbc.Driver");
-
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
-
-        PreparedStatement ps = conn.prepareStatement(SQL);
-
-
-        ResultSet result = ps.executeQuery();
-
-            ArrayList<Supplier1> suppliers = new ArrayList<>();
-
-
-            while (result.next()){
-                suppliers.add(new Supplier1(
-                        result.getString("sid"),
-                        result.getString("sname"),
-                        result.getString("address"),
-                        String.valueOf(result.getInt("tel"))
-                ));
-
-        }
-            return suppliers;
-
-    } catch (Exception e) {
-        System.out.println(e.getMessage());
-    }
-        return null;
-    }
 }
