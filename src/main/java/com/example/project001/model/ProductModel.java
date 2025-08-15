@@ -3,14 +3,17 @@ package com.example.project001.model;
 import com.example.project001.db.DataBaseConnection;
 import com.example.project001.dto.ProductDto;
 import com.example.project001.dto.SupplierDto;
+import com.example.project001.tm.Product;
+import com.example.project001.tm.Supplier1;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class ProductModel {
 
     public static int saveProduct(ProductDto productDto) {
         try {
-            String addNewProduct = "INSERT INTO product () VALUES (?,?,?,?)";
+            String addNewProduct = "INSERT INTO product (name, description, unit_price, supplier_id) VALUES (?,?,?,?)";
 
             Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -105,6 +108,40 @@ public class ProductModel {
             }
 
             conn.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public static ArrayList<Product> getAllProducts() {
+
+        try {
+            String SQL = "SELECT * FROM Product";
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/possystem","root","1234");
+            PreparedStatement ps = conn.prepareStatement(SQL);
+
+
+            ResultSet result = ps.executeQuery();
+
+            ArrayList<Product> products = new ArrayList<>();
+
+
+            while (result.next()){
+                products.add(new Product(
+                        result.getInt("id"),
+                        result.getString("name"),
+                        result.getString("description"),
+                        result.getDouble("unit_price"),
+                        result.getString("supplier_id")
+
+                ));
+
+            }
+            return products;
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
